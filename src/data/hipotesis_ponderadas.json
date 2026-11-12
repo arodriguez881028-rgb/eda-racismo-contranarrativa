@@ -1,0 +1,51 @@
+{
+  "titulo": "Contrastes exploratorios ponderados con PESO",
+  "limitacion_general": "Contrastes model-based aproximados; no incorporan estratos, conglomerados ni toda la varianza del diseño muestral CIS. No prueban causalidad.",
+  "H1_ideologia": {
+    "H0": "La brecha media es igual en izquierda, centro y derecha.",
+    "prueba": "WLS; contraste F conjunto de izquierda y derecha frente a centro.",
+    "F": 207.8667830189153,
+    "gl_num": 2.0,
+    "gl_den": 3774.0,
+    "p_valor": 2.2878578244724088e-86,
+    "n": 3777,
+    "brecha_media_ponderada_por_grupo": {
+      "Centro (5-6)": 3.096972245646559,
+      "Derecha (7-10)": 2.0248722414573668,
+      "Izquierda (1-4)": 4.349565767112318
+    },
+    "decision": "Rechazar H0; la brecha varía entre los bloques ideológicos."
+  },
+  "H2_edad_redes": {
+    "H0": "Edad y recuerdo de contenido ofensivo/violento en redes son independientes.",
+    "prueba": "Chi-cuadrado sobre tabla de contingencia ponderada.",
+    "chi2": 25.990077780809475,
+    "gl": 4,
+    "p_valor": 3.179072464474284e-05,
+    "n": 3676,
+    "definicion_P11": "Sí a menudo / sí en alguna ocasión frente a No; se excluyen no usuarios y NS/NC.",
+    "limitacion": "Suma de pesos tratada como frecuencias; p indicativo, no ajustado al diseño complejo.",
+    "decision": "Rechazar H0; edad y recuerdo de exposición muestran asociación en esta tabla."
+  },
+  "sexo": {
+    "H0": "La brecha media es igual entre mujeres y hombres.",
+    "prueba": "Welch t-test entre medias ponderadas.",
+    "t": 9.968816900320519,
+    "gl_aprox": 3866.0269803938104,
+    "p_valor": 3.96002706919274e-23,
+    "n": 3913,
+    "brecha_mujeres": 3.923372605211028,
+    "brecha_hombres": 2.9614178629348165,
+    "decision": "Rechazar H0; la brecha ponderada es mayor entre mujeres."
+  },
+  "ingresos_control_ideologia": {
+    "H0": "Las medias de brecha de ingresos medios y altos no difieren de ingresos bajos, ajustando por ideología.",
+    "prueba": "WLS multivariante; contraste F conjunto de ingresos medios y altos frente a bajos.",
+    "F": 45.02211923779666,
+    "gl_num": 2.0,
+    "gl_den": 3800.0,
+    "p_valor": 4.733769382985286e-20,
+    "n": 3806,
+    "decision": "Rechazar H0; persisten diferencias de brecha por tramo de ingresos tras ajustar por ideología."
+  }
+}
