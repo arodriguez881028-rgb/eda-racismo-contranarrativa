@@ -1,0 +1,16 @@
+"""Regenera src/main.ipynb sin dependencias adicionales."""
+import json
+from pathlib import Path
+
+cells = [
+ {"cell_type":"markdown","metadata":{},"source":["# EDA · Racismo y contranarrativa\n","\n","Exploración del Barómetro CIS 3536 (diciembre 2025). Pregunta: ¿la media que las personas atribuyen a la sociedad española es superior a su autopercepción?\n","\n","La escala P12 va de 0 (nada racista) a 10 (muy racista). Se utiliza PESO y se excluyen NS/NC."]},
+ {"cell_type":"code","execution_count":None,"metadata":{},"outputs":[],"source":["from pathlib import Path\n","import sys\n","ROOT = Path.cwd()\n","if not (ROOT / 'src/main.py').exists(): ROOT = ROOT.parent\n","sys.path.insert(0, str(ROOT / 'src'))\n","from main import load, summary, weighted_hypothesis_test\n","data = ROOT / 'src/data/raw/3536_etiq.csv'\n","df = load(data)\n","len(df)"]},
+ {"cell_type":"markdown","metadata":{},"source":["## Hipótesis y control de alcance\n","\n","H1: la media ponderada P12_2 (sociedad) supera a la media P12_1 (autopercepción). El contraste de la diferencia es aproximado: emplea el tamaño efectivo de Kish y no incorpora estratos/PSU del diseño completo. Las diferencias entre subgrupos son descriptivas."]},
+ {"cell_type":"code","execution_count":None,"metadata":{},"outputs":[],"source":["contraste = weighted_hypothesis_test(df)\n","contraste"]},
+ {"cell_type":"code","execution_count":None,"metadata":{},"outputs":[],"source":["tabla = summary(df)\n","tabla.head(10)"]},
+ {"cell_type":"markdown","metadata":{},"source":["## Gráficos y resultados\n","\n","El script calcula y exporta cinco gráficos SVG para la presentación HTML. Las series históricas incluidas en la presentación son imágenes de referencia aportadas; no forman parte del fichero microdatos 3536."]},
+ {"cell_type":"code","execution_count":None,"metadata":{},"outputs":[],"source":["from IPython.display import display, Image\n","display(Image(filename=str(ROOT / 'presentation/assets/sexo.svg')))\n","display(Image(filename=str(ROOT / 'presentation/assets/ideologia.svg')))"]},
+ {"cell_type":"markdown","metadata":{},"source":["## Lectura final\n","\n","La brecha media en la encuesta es 3,45 puntos (autopercepción 1,79; sociedad 5,24; n válido=3.913). El resultado confirma H1 en sentido descriptivo y en un contraste ponderado aproximado; no estima prevalencia conductual, causalidad o diferencias significativas entre cada perfil."]}
+]
+nb={"cells":cells,"metadata":{"kernelspec":{"display_name":"Python 3","language":"python","name":"python3"},"language_info":{"name":"python","version":"3.11"}},"nbformat":4,"nbformat_minor":5}
+Path(__file__).with_name('main.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=1),encoding='utf-8')
