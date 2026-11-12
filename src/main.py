@@ -20,6 +20,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy import stats
+import statsmodels.api as sm
+from statsmodels.formula.api import wls
+from statsmodels.stats.weightstats import DescrStatsW
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "presentation" / "assets"
@@ -35,6 +39,7 @@ COL = {
     "education": "NIVELESTENTREV Nivel de estudios alcanzado por la persona entrevistada",
     "education_group": "ESTUDIOS Estudios de la persona entrevistada",
     "weight": "PESO Ponderación con ajuste por Estudios",
+    "social_media": "P11 Recuerdo de haber visto en las redes sociales contenido que exprese ideas ofensivas o violentas contra personas por motivos étnicos, de raza o religión",
 }
 
 
@@ -130,6 +135,145 @@ def weighted_hypothesis_test(df):
             "nota": "Aproximación con n efectivo de Kish; no incorpora estratos/PSU ni varianza compleja del diseño CIS."}
 
 
+def _p_value(value):
+    value = float(value)
+    return "<1e-300" if value < 1e-300 else value
+
+
+def hypothesis_tests(df):
+    """Run the weighted exploratory contrasts shown in the presentation.
+
+    These are model-based approximations: PESO is applied, but the flat CIS
+    microdata do not provide the full design information needed for design-
+    based standard errors. The weighted chi-square treats weight sums as
+    frequencies and must be read with particular caution.
+    """
+    data = df.copy()
+    data["brecha"] = data["percepcion_sociedad"] - data["autopercepcion"]
+    data["ideol_grupo"] = groups(data)["Bloque ideológico"].replace({
+        "Izquierda (1–4)": "Izquierda (1-4)",
+        "Centro (5–6)": "Centro (5-6)",
+        "Derecha (7–10)": "Derecha (7-10)",
+    })
+    data["edad_grupo"] = groups(data)["Tramo de edad"]
+    data["sexo_label"] = data[COL["sex"]]
+    data["ingreso_grupo"] = groups(data)["Ingresos del hogar"].replace({
+        "Bajos (≤ 1.800 €)": "1. Bajos (≤1.800€)",
+        "Medios (1.801–3.900 €)": "2. Medios (1.801-3.900€)",
+        "Altos (> 3.900 €)": "3. Altos (>3.900€)",
+    })
+    social_media = data[COL["social_media"]].astype(str)
+    data["p11_binario"] = np.select(
+        [social_media.str.startswith("Sí"), social_media.eq("No")],
+        ["Vio contenido", "No vio contenido"],
+        default="No válido",
+    )
+    valid_gap = (data["brecha"].notna() & data["peso"].notna() & (data["peso"] > 0))
+
+    # H1: Are mean perception gaps equal across the three ideological groups?
+    h1 = data.loc[valid_gap & data["ideol_grupo"].isin(
+        ["Izquierda (1-4)", "Centro (5-6)", "Derecha (7-10)"]
+    )].copy()
+    model_ideology = wls(
+        'brecha ~ C(ideol_grupo, Treatment(reference="Centro (5-6)"))',
+        data=h1, weights=h1["peso"],
+    ).fit()
+    f_ideology = model_ideology.f_test(
+        'C(ideol_grupo, Treatment(reference="Centro (5-6)"))[T.Izquierda (1-4)] = 0, '
+        'C(ideol_grupo, Treatment(reference="Centro (5-6)"))[T.Derecha (7-10)] = 0'
+    )
+    ideology_means = {
+        group: weighted_mean(sub["brecha"], sub["peso"])
+        for group, sub in h1.groupby("ideol_grupo", observed=True)
+    }
+
+    # H2: Is age associated with recalling hateful/offensive social content?
+    h2 = data.loc[
+        data["edad_grupo"].notna()
+        & data["p11_binario"].isin(["Vio contenido", "No vio contenido"])
+        & data["peso"].notna() & (data["peso"] > 0)
+    ].copy()
+    table = pd.crosstab(
+        h2["edad_grupo"], h2["p11_binario"], values=h2["peso"], aggfunc="sum"
+    )
+    chi2, p_age_media, dof_age_media, _ = stats.chi2_contingency(table)
+
+    # Sex: Welch comparison of weighted mean gaps.
+    by_sex = data.loc[valid_gap & data["sexo_label"].notna()]
+    men = DescrStatsW(
+        by_sex.loc[by_sex["sexo_label"] == "Hombre", "brecha"],
+        weights=by_sex.loc[by_sex["sexo_label"] == "Hombre", "peso"],
+    )
+    women = DescrStatsW(
+        by_sex.loc[by_sex["sexo_label"] == "Mujer", "brecha"],
+        weights=by_sex.loc[by_sex["sexo_label"] == "Mujer", "peso"],
+    )
+    t_sex, p_sex, df_sex = sm.stats.CompareMeans(women, men).ttest_ind(usevar="unequal")
+
+    # Income: do medium/high household-income coefficients jointly differ
+    # from the low-income reference after adjusting for ideology?
+    h_income = data.loc[
+        valid_gap
+        & data["ingreso_grupo"].isin([
+            "1. Bajos (≤1.800€)", "2. Medios (1.801-3.900€)", "3. Altos (>3.900€)"
+        ])
+        & data["ideol_grupo"].notna()
+    ].copy()
+    h_income["ingreso_grupo"] = pd.Categorical(
+        h_income["ingreso_grupo"],
+        categories=["1. Bajos (≤1.800€)", "2. Medios (1.801-3.900€)", "3. Altos (>3.900€)"],
+    )
+    model_income = wls(
+        "brecha ~ C(ingreso_grupo) + C(ideol_grupo)",
+        data=h_income, weights=h_income["peso"],
+    ).fit()
+    f_income = model_income.f_test(
+        "C(ingreso_grupo)[T.2. Medios (1.801-3.900€)] = 0, "
+        "C(ingreso_grupo)[T.3. Altos (>3.900€)] = 0"
+    )
+
+    return {
+        "titulo": "Contrastes exploratorios ponderados con PESO",
+        "limitacion_general": (
+            "Contrastes model-based aproximados; no incorporan estratos, conglomerados "
+            "ni toda la varianza del diseño muestral CIS. No prueban causalidad."
+        ),
+        "H1_ideologia": {
+            "H0": "La brecha media es igual en izquierda, centro y derecha.",
+            "prueba": "WLS; contraste F conjunto de izquierda y derecha frente a centro.",
+            "F": float(f_ideology.fvalue), "gl_num": float(f_ideology.df_num),
+            "gl_den": float(f_ideology.df_denom), "p_valor": _p_value(f_ideology.pvalue),
+            "n": int(len(h1)), "brecha_media_ponderada_por_grupo": ideology_means,
+            "decision": "Rechazar H0; la brecha varía entre los bloques ideológicos.",
+        },
+        "H2_edad_redes": {
+            "H0": "Edad y recuerdo de contenido ofensivo/violento en redes son independientes.",
+            "prueba": "Chi-cuadrado sobre tabla de contingencia ponderada.",
+            "chi2": float(chi2), "gl": int(dof_age_media),
+            "p_valor": _p_value(p_age_media), "n": int(len(h2)),
+            "definicion_P11": "Sí a menudo / sí en alguna ocasión frente a No; se excluyen no usuarios y NS/NC.",
+            "limitacion": "Suma de pesos tratada como frecuencias; p indicativo, no ajustado al diseño complejo.",
+            "decision": "Rechazar H0; edad y recuerdo de exposición muestran asociación en esta tabla.",
+        },
+        "sexo": {
+            "H0": "La brecha media es igual entre mujeres y hombres.",
+            "prueba": "Welch t-test entre medias ponderadas.",
+            "t": float(t_sex), "gl_aprox": float(df_sex),
+            "p_valor": _p_value(p_sex), "n": int(len(by_sex)),
+            "brecha_mujeres": float(women.mean), "brecha_hombres": float(men.mean),
+            "decision": "Rechazar H0; la brecha ponderada es mayor entre mujeres.",
+        },
+        "ingresos_control_ideologia": {
+            "H0": "Las medias de brecha de ingresos medios y altos no difieren de ingresos bajos, ajustando por ideología.",
+            "prueba": "WLS multivariante; contraste F conjunto de ingresos medios y altos frente a bajos.",
+            "F": float(f_income.fvalue), "gl_num": float(f_income.df_num),
+            "gl_den": float(f_income.df_denom), "p_valor": _p_value(f_income.pvalue),
+            "n": int(len(h_income)),
+            "decision": "Rechazar H0; persisten diferencias de brecha por tramo de ingresos tras ajustar por ideología.",
+        },
+    }
+
+
 def chart(result, dimension, title, filename):
     part = result[result["dimensión"] == dimension].copy()
     if part.empty:
@@ -161,6 +305,8 @@ def main():
     result = summary(df)
     contrast = weighted_hypothesis_test(df)
     (ROOT / "src/data/contraste_ponderado.json").write_text(json.dumps(contrast, indent=2, ensure_ascii=False), encoding="utf-8")
+    tests = hypothesis_tests(df)
+    (ROOT / "src/data/hipotesis_ponderadas.json").write_text(json.dumps(tests, indent=2, ensure_ascii=False), encoding="utf-8")
     for dimension, title, filename in [
         ("Sexo", "La brecha aparece en hombres y mujeres", "sexo.svg"),
         ("Tramo de edad", "La percepción social supera la autopercepción en todas las edades", "edad.svg"),
