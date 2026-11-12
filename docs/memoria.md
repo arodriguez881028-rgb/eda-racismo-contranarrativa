@@ -24,13 +24,21 @@ La media ponderada de autopercepción es **1,79/10** y la media atribuida a la s
 
 La brecha por sexo es de 2,96 puntos entre hombres y 3,92 entre mujeres. Por edades, oscila aproximadamente entre 3,17 y 3,84. En los bloques ideológicos, es mayor en la izquierda (4,35) y menor en la derecha (2,02), donde la autopercepción media es más alta. La sociedad se valora entre 4,76 y 5,78 según el bloque. Por ingresos y estudios también se mantiene la dirección de la brecha.
 
-## 5. Interpretación y límites
+## 5. Contraste de hipótesis
+
+Además de la hipótesis principal, se contrastaron cuatro relaciones con `PESO`: (H1) igualdad de la brecha por bloque ideológico mediante un contraste F conjunto en WLS; (H2) independencia entre tramo de edad y recuerdo de haber visto contenido ofensivo/violento en redes mediante una tabla de contingencia ponderada; diferencia de brecha entre mujeres y hombres mediante Welch; y diferencias por ingresos medios/altos frente a bajos mediante WLS ajustado por ideología.
+
+En todos los contrastes se rechazó H₀ con los procedimientos aproximados: ideología, F(2, 3.774) = 207,87, p < 0,001; edad y recuerdo de contenido en redes, χ²(4) = 25,99, p < 0,001; sexo, t de Welch ≈ 9,97, p < 0,001; ingresos ajustados por ideología, F(2, 3.800) = 45,02, p < 0,001. La brecha ponderada media fue 4,35 en izquierda, 3,10 en centro y 2,02 en derecha; 3,92 entre mujeres y 2,96 entre hombres. En H2 se agrupan respuestas «sí, a menudo» y «sí, en alguna ocasión»; se excluyen no usuarios de redes y NS/NC. El fichero `src/data/hipotesis_ponderadas.json` recoge resultados, tamaños y definiciones.
+
+Los resultados apoyan asociaciones en esta muestra, no explicaciones causales. El contraste de H2 trata sumas de pesos como frecuencias y su p-valor es indicativo. Ninguno de los contrastes incorpora la varianza completa del diseño muestral CIS ni corrección por comparaciones múltiples.
+
+## 6. Interpretación y límites
 
 El hallazgo es una brecha de percepción declarada: las personas sitúan a la sociedad por encima de sí mismas en una escala subjetiva. No demuestra que una persona concreta sea racista, ni estima la incidencia real de discriminación, ni explica por qué se produce la diferencia. Puede intervenir deseabilidad social, interpretación de la escala o distintas ideas sobre qué significa racismo.
 
-Se contrasta H0: diferencia media ponderada P12_2–P12_1 = 0 mediante un Wald aproximado con tamaño efectivo de Kish: z = 49,01; p < 0,001; IC95% aproximado [3,31; 3,59]. La prueba respalda que la brecha media es mayor que cero, pero no incorpora estratos/PSU ni estima la varianza compleja del diseño CIS. Por tanto, no debe leerse como una prueba de diferencias entre perfiles ni como inferencia de causalidad. Los tamaños varían; el grupo de estudios primarios o menos tiene 131 casos válidos. La aproximación de contraste no corrige el diseño complejo y no se presentan pruebas de significación entre subgrupos. La ficha técnica ofrece un error de ±1,6 puntos porcentuales para el conjunto bajo el supuesto de muestreo aleatorio simple, pero no equivale a una estimación de incertidumbre para cada promedio ponderado o subgrupo.
+Se contrasta H0: diferencia media ponderada P12_2–P12_1 = 0 mediante un Wald aproximado con tamaño efectivo de Kish: z = 49,01; p < 0,001; IC95% aproximado [3,31; 3,59]. La prueba respalda que la brecha media es mayor que cero, pero no incorpora estratos/PSU ni estima la varianza compleja del diseño CIS. Por tanto, no debe leerse como una inferencia causal. Los tamaños varían; el grupo de estudios primarios o menos tiene 131 casos válidos. La ficha técnica ofrece un error de ±1,6 puntos porcentuales para el conjunto bajo el supuesto de muestreo aleatorio simple, pero no equivale a una estimación de incertidumbre para cada promedio ponderado o subgrupo.
 
-Las cifras sobre EPA, sanidad e IMV de la última diapositiva son fuentes externas, con unidades y fechas propias. No se mezclan con los microdatos CIS. Deben citarse con su periodo de referencia y no interpretarse como evidencia causal.
+Las cifras sobre EPA, sanidad e IMV de la diapositiva 14 son fuentes externas, con unidades y fechas propias. No se mezclan con los microdatos CIS. El Excel de altas iniciales acumuladas del IMV (junio de 2020–enero de 2026) no contiene nacionalidad, así que no respalda el 17,5% de titulares extranjeros, que se cita con la tabla de mayo de 2026. Deben citarse con su periodo de referencia y no interpretarse como evidencia causal.
 
 ## 6. Conclusión
 
@@ -39,5 +47,5 @@ La autopercepción es claramente menor que la percepción de la sociedad en esta
 ## 7. Fuentes y herramientas
 
 - Centro de Investigaciones Sociológicas, estudio 3536, Barómetro de diciembre de 2025: microdatos etiquetados, cuestionario y ficha técnica.
-- Encuesta de Población Activa (INE), informe sanitario del Ministerio de Sanidad y estadísticas del Ingreso Mínimo Vital de la Seguridad Social: fuentes independientes citadas en la diapositiva final.
-- Python, pandas, NumPy, Matplotlib, Jupyter, HTML, CSS y JavaScript.
+- Encuesta de Población Activa (INE), informe sanitario del Ministerio de Sanidad y estadísticas del Ingreso Mínimo Vital de la Seguridad Social: fuentes independientes citadas en la diapositiva 14. El Excel de altas acumuladas está incluido como documentación complementaria.
+- Python, pandas, NumPy, SciPy, statsmodels, Matplotlib, Jupyter, HTML, CSS y JavaScript.

@@ -17,6 +17,11 @@ Los gráficos históricos que aparecen en la presentación se aportaron como im�
 
 - INE, EPA 3T 2026: https://www.ine.es/dyngs/Prensa/EPA3T26.htm
 - Ministerio de Sanidad, estado de salud y uso sanitario por población migrante: https://www.sanidad.gob.es/gabinete/notasPrensa.do?id=6924
-- Seguridad Social, estadísticas de titulares del IMV: https://www.seg-social.es/wps/wcm/connect/wss/9d6df71d-1589-4b8d-990a-03cb323d5d4c/202605%2BCOMPLETO%2BDossier%2Bcomunidad%2Baut%C3%B3noma%2By%2Bprovincia.pdf?CACHEID=ROOTWORKSPACE.Z18_81D21J401P5L40QTIT61G41000-9d6df71d-1589-4b8d-990a-03cb323d5d4c-pWmQLz4&CONVERT_TO=linktext&MOD=AJPERES
+- Seguridad Social, dosier del IMV de mayo de 2026, tabla de sexo y nacionalidad de titulares: https://www.seg-social.es/wps/portal/wss/internet/EstadisticasPresupuestosEstudios/Estadisticas/cbe2fda1-3ac7-4bc8-a5ec-06c178839e11/0e716715-d290-4745-a74a-28cc1c3bc9ea/e221487c-d047-45cb-b862-8615b69f3ad4
+- **Documento local añadido:** `202601_IMV_Altas_acumuladas.xlsx`, publicado por la Seguridad Social. Resume altas iniciales de prestaciones que han figurado en nómina entre junio de 2020 y enero de 2026, desglosadas por comunidad/provincia, expedientes aprobados, sexo y composición de hogares.
+
+El Excel de altas acumuladas **no incluye nacionalidad**. No es la fuente que permite calcular el 17,5% de titulares extranjeros; esa cifra se refiere a la nómina de mayo de 2026 y procede de la tabla de nacionalidad del dosier mensual de la Seguridad Social. Titulares, expedientes y personas beneficiarias son unidades distintas. La proporción extranjera cambia con el mes de referencia.
+
+El informe de Sanidad de 2026 compara población por lugar de nacimiento y regiones de origen: señala hasta 65% más personas con tres o más problemas crónicos en población nacida en España, y un consumo de medicamentos 62,7% superior al de población procedente de África y casi 50% superior al de población latinoamericana. Son indicadores concretos del informe, no una medida exhaustiva de presión asistencial.
 
 Cada cifra externa mantiene su periodo de referencia y su unidad de análisis. La tasa de actividad no es la tasa de empleo; titulares de IMV no equivale a personas beneficiarias del hogar.
