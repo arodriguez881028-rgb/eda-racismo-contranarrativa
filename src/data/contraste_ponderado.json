@@ -1,0 +1,12 @@
+{
+  "contraste": "H0: media ponderada (P12_2 - P12_1) = 0",
+  "media_diferencia": 3.45008305498464,
+  "error_estandar_aprox": 0.07040159574318824,
+  "IC95_inferior_aprox": 3.312095927327991,
+  "IC95_superior_aprox": 3.5880701826412893,
+  "n_valido": 3913,
+  "n_efectivo_Kish": 1863.5001820678835,
+  "z_aprox": 49.005750772608806,
+  "p_valor_normal_aprox": "<1e-300",
+  "nota": "Aproximación con n efectivo de Kish; no incorpora estratos/PSU ni varianza compleja del diseño CIS."
+}
